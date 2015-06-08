@@ -1,11 +1,11 @@
 {
-  "name": "billid-poc-services",
+  "name": "poc-services",
   "description": "billid PoC App - common angular services for mobile and web",
   "version": "1.0.0",
-  "homepage": "https://github.com/billidin/billid-poc-services",
+  "homepage": "https://github.com/billidin/poc-services",
   "repository": {
     "type": "git",
-    "url": "https://github.com/billidin/billid-poc-services.git"
+    "url": "https://github.com/billidin/poc-services.git"
   },
   "dependencies": {},
   "devDependencies": {
