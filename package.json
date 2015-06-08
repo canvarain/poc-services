@@ -1,0 +1,19 @@
+{
+  "name": "billid-poc-services",
+  "description": "billid PoC App - common angular services for mobile and web",
+  "version": "1.0.0",
+  "homepage": "https://github.com/billidin/billid-poc-services",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/billidin/billid-poc-services.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "load-grunt-tasks": "~0.4.0",
+    "grunt-contrib-clean": "~0.5.0"
+  },
+  "main": "dist/services.js"
+}
