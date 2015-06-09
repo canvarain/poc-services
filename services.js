@@ -32,7 +32,8 @@
         DESCENDING: 'DESC'
       },
       SERVICES: {
-        Receipts: 'Receipts'
+        Receipts: 'Receipts',
+        Organizations: 'Organizations'
       }
     })
     .factory('RequestHelper', ['$q', '$http', 'APP_CONSTANTS', 'ApplicationStorage', 'Logger',
@@ -364,6 +365,78 @@
     }])
     .factory('Receipts', ['ServicesResolver', 'APP_CONSTANTS', function(ServicesResolver, APP_CONSTANTS) {
       return ServicesResolver.getService(APP_CONSTANTS.SERVICES.Receipts);
+    }])
+    .service('OrganizationsMock', ['BASE_DEV_URL', 'RequestHelper',
+      function(BASE_DEV_URL, RequestHelper) {
+        var service = {};
+
+      service.get = function(id) {
+        return RequestHelper.execute({
+          url: BASE_DEV_URL + '/getOrganizations.json'
+        });
+      };
+
+      service.create = function(entity) {
+        return RequestHelper.execute({
+          url: BASE_DEV_URL + '/createOrganization.json',
+          headers: {}
+        });
+      };
+
+      service.query = function(queryCriteria) {
+        return RequestHelper.execute({
+          url: BASE_DEV_URL + '/queryOrganizations.json'
+        });
+      };
+
+      service.update = function(id, entity) {
+        return RequestHelper.execute({
+          url: BASE_DEV_URL + '/updateOrganizations.json'
+        });
+      };
+
+      return service;
+    }])
+    .service('OrganizationsProduction', ['BASE_URL', 'RequestHelper',
+      function(BASE_URL, RequestHelper) {
+
+      var service = {},
+      serviceURL = BASE_URL + '/organizations';
+
+      service.get = function(id) {
+         return RequestHelper.execute({
+          url: serviceURL + '/' + id
+        });
+      };
+
+      service.create = function(entity) {
+        return RequestHelper.execute({
+          method: 'POST',
+          url: serviceURL,
+          data: entity,
+          headers: {}
+        });
+      };
+
+      service.query = function(queryCriteria) {
+        return RequestHelper.execute({
+          url: serviceURL + '?' + ApplicationUtil.parseQueryCriteria(queryCriteria)
+        });
+      };
+
+      service.update = function(id, entity) {
+        return RequestHelper.execute({
+          method: 'PUT',
+          url : serviceURL + '/' + id,
+          data: entity
+        });
+      };
+
+      return service;
+
+    }])
+    .factory('Organizations', ['ServicesResolver', 'APP_CONSTANTS', function(ServicesResolver, APP_CONSTANTS) {
+      return ServicesResolver.getService(APP_CONSTANTS.SERVICES.Organizations);
     }]);
 
     angular.module('billidpoc.auth-services', [])
@@ -385,5 +458,5 @@
           return $q.reject(response);
         }
       };
-      }]);
+  }]);
 }(angular));
