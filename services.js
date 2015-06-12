@@ -212,7 +212,7 @@
 
         service.getUserProfile = function() {
           var req = RequestHelper.execute({
-            url: BASE_URL + '/profiles/me'
+            url: BASE_URL + '/me'
           });
         };
 
@@ -356,7 +356,7 @@
 
       service.me = function(queryCriteria) {
         return RequestHelper.execute({
-          url: serviceURL + '/me?' + ApplicationUtil.parseQueryCriteria(queryCriteria)
+          url: '/me' + serviceURL  + ApplicationUtil.parseQueryCriteria(queryCriteria)
         });
       };
 
