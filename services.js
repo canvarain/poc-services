@@ -303,9 +303,9 @@
         });
       };
 
-      service.create = function(entity, apiKey) {
+      service.create = function(entity) {
         return RequestHelper.execute({
-          url: BASE_DEV_URL + '/createReceipt.json?key=' + apiKey,
+          url: BASE_DEV_URL + '/createReceipt.json',
           headers: {}
         });
       };
