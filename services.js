@@ -41,10 +41,7 @@
     .factory('RequestHelper', ['$q', '$http', 'APP_CONSTANTS', 'ApplicationStorage', 'Logger',
       function( $q, $http, APP_CONSTANTS, ApplicationStorage, Logger){
         var service = {};
-        var defaultMethod  = 'GET',
-        defaultHeader = {
-          'Authorization': APP_CONSTANTS.STRATAGIES.BEARER + ' ' + ApplicationStorage.getJwtToken()
-        };
+        var defaultMethod  = 'GET';
 
         /**
         * Creates a request object for an ajax call ($http)
@@ -52,14 +49,16 @@
         * @returns an object containing the request attributes
         */
         service.createRequest = function(options) {
-
+          var defaultHeader = {
+            'Authorization': APP_CONSTANTS.STRATAGIES.BEARER + ' ' + ApplicationStorage.getJwtToken()
+          };
           // Options must exist and it should contain the url attribute
           if(!options) {
             throw new Error(' empty options found for createRequest');
           }
 
           // check that the options has URL
-          if(!option.url) {
+          if(!options.url) {
             throw new Error(' no url found for createRequest');
           }
 
@@ -76,6 +75,7 @@
           if(options.data) {
             req.data = options.data;
           }
+          return req;
         };
 
         /**
@@ -89,7 +89,7 @@
           req = service.createRequest(options);
 
           $http(req).then(function(payload) {
-            deferred.resolve(payload);
+            deferred.resolve(payload.data);
           }, function(reason) {
             Logger.error(reason, 'error executing ' + JSON.stringify(req));
             deferred.reject(reason);
@@ -191,9 +191,9 @@
       function(BASE_DEV_URL, $http, $q, RequestHelper, Logger) {
         var service = {};
         service.getUserProfile = function() {
-            return RequestHelper.execute ({
-              url: BASE_DEV_URL + '/getUserProfiles.json'
-            });
+          return RequestHelper.execute ({
+            url: BASE_DEV_URL + '/getUserProfileProfiles.json'
+          });
         };
 
         service.fetchAndSaveUserProfile = function() {
@@ -201,14 +201,26 @@
             ApplicationStorage.storeUserProfile(profile);
           });
         };
+
+        service.updateDevice = function(deviceId, type) {
+          return RequestHelper.execute ({
+            url: BASE_DEV_URL + '/updateDeviceProfiles.json'
+          });
+        };
+
+        service.removeDevice = function(deviceId) {
+          return RequestHelper.execute ({
+            url: BASE_DEV_URL + '/removeDeviceProfiles.json'
+          });
+        };
         return service;
     }])
-    .service('ProfilesProduction', ['BASE_URL', '$http', '$q', 'RequestHelper', 'Logger', 'ApplicationUtil',
-      function(BASE_URL, $http, $q, RequestHelper, Logger, ApplicationUtil) {
+    .service('ProfilesProduction', ['BASE_URL', '$http', '$q', 'RequestHelper', 'Logger', 'ApplicationUtil', 'ApplicationStorage',
+      function(BASE_URL, $http, $q, RequestHelper, Logger, ApplicationUtil, ApplicationStorage) {
         var service = {};
 
         service.getUserProfile = function() {
-          var req = RequestHelper.execute({
+          return RequestHelper.execute({
             url: BASE_URL + '/me'
           });
         };
@@ -216,6 +228,29 @@
         service.fetchAndSaveUserProfile = function() {
           this.getUserProfile().then(function(profile){
             ApplicationStorage.storeUserProfile(profile);
+          });
+        };
+
+        service.updateDevice = function(deviceId, type) {
+          var profile = ApplicationStorage.getUserProfile();
+          return RequestHelper.execute({
+            url: BASE_URL + 'users/' + profile.id + '/updateDevice',
+            method: 'POST',
+            data: {
+              deviceId: deviceId,
+              deviceType: type
+            }
+          });
+        };
+
+        service.removeDevice = function(deviceId) {
+          var profile = ApplicationStorage.getUserProfile();
+          return RequestHelper.execute({
+            url: BASE_URL + 'users/' + profile.id + '/removeDevice',
+            method: 'POST',
+            data: {
+              deviceId: deviceId
+            }
           });
         };
         return service;
@@ -227,11 +262,11 @@
       var service = {};
       service.login = function(credentials) {
         var deferred = $q.defer();
-        $http.get(BASE_DEV_URL + '/auth.json').then(function(payload) {
-          ApplicationStorage.storeJwtToken(payload.token, credentials.rememberMe);
+        $http.get(BASE_DEV_URL + '/loginAuth.json').then(function(payload) {
+          ApplicationStorage.storeJwtToken(payload.data.token, credentials.rememberMe);
           // Get the user profile and save it to local storage
           Profiles.fetchAndSaveUserProfile();
-          deferred.resolve(payload);
+          deferred.resolve(payload.data);
         }, function(reason) {
           Logger.error(reason, 'Error while authentication');
           deferred.reject(reason);
@@ -263,10 +298,10 @@
           }
         };
         $http(req).then(function(payload) {
-          ApplicationStorage.storeJwtToken(payload.token, credentials.rememberMe);
+          ApplicationStorage.storeJwtToken(payload.data.token, credentials.rememberMe);
           // Get the user profile and save it to local storage
           Profiles.fetchAndSaveUserProfile();
-          deferred.resolve(payload);
+          deferred.resolve(payload.data);
         }, function(reason) {
           Logger.error(reason, 'Error while authentication');
           deferred.reject(reason);
@@ -297,7 +332,7 @@
 
       service.create = function(entity) {
         return RequestHelper.execute({
-          url: BASE_DEV_URL + '/createReceipt.json',
+          url: BASE_DEV_URL + '/createReceipts.json',
           headers: {}
         });
       };
@@ -348,7 +383,7 @@
 
       service.me = function() {
         return RequestHelper.execute({
-          url: '/me' + serviceURL
+          url: BASE_URL + '/me/receipts'
         });
       };
 
@@ -370,7 +405,7 @@
 
       service.create = function(entity) {
         return RequestHelper.execute({
-          url: BASE_DEV_URL + '/createOrganization.json',
+          url: BASE_DEV_URL + '/createOrganizations.json',
           headers: {}
         });
       };
