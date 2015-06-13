@@ -33,6 +33,8 @@
       },
       SERVICES: {
         Receipts: 'Receipts',
+        Profiles: 'Profiles',
+        Auth: 'Auth',
         Organizations: 'Organizations'
       }
     })
@@ -87,7 +89,7 @@
           req = service.createRequest(options);
 
           $http(req).then(function(payload) {
-            deferred.resolve(payload.data);
+            deferred.resolve(payload);
           }, function(reason) {
             Logger.error(reason, 'error executing ' + JSON.stringify(req));
             deferred.reject(reason);
@@ -105,7 +107,7 @@
           var mockName = serviceName + 'Mock', productionName = serviceName + 'Production';
           if(ENVIRONMENT === DEFAULT_ENVIRONMENTS.DEV) {
             return $injector.get(mockName);
-          } else if(ENVIRONMENT === DEFAULT_ENVIRONMENTS.DEV || DEFAULT_ENVIRONMENTS.PRODUCTION) {
+          } else if(ENVIRONMENT === DEFAULT_ENVIRONMENTS.STAGING || DEFAULT_ENVIRONMENTS.PRODUCTION) {
             return $injector.get(productionName);
           } else {
             throw new Error(ENVIRONMENT + ' environment is not supported');
@@ -199,11 +201,6 @@
             ApplicationStorage.storeUserProfile(profile);
           });
         };
-
-        service.can = function(permission) {
-          return _.indexOf(ApplicationStorage.getUserProfile().permissions, permission) !== -1;
-        };
-
         return service;
     }])
     .service('ProfilesProduction', ['BASE_URL', '$http', '$q', 'RequestHelper', 'Logger', 'ApplicationUtil',
@@ -221,11 +218,6 @@
             ApplicationStorage.storeUserProfile(profile);
           });
         };
-
-        service.can = function(permission) {
-          return _.indexOf(ApplicationStorage.getUserProfile().permissions, permission) !== -1;
-        };
-
         return service;
     }])
     .factory('Profiles', ['ServicesResolver', 'APP_CONSTANTS', function(ServicesResolver, APP_CONSTANTS) {
@@ -236,10 +228,10 @@
       service.login = function(credentials) {
         var deferred = $q.defer();
         $http.get(BASE_DEV_URL + '/auth.json').then(function(payload) {
-          ApplicationStorage.storeJwtToken(payload.data.data[0].token, credentials.rememberMe);
+          ApplicationStorage.storeJwtToken(payload.token, credentials.rememberMe);
           // Get the user profile and save it to local storage
           Profiles.fetchAndSaveUserProfile();
-          deferred.resolve(payload.data);
+          deferred.resolve(payload);
         }, function(reason) {
           Logger.error(reason, 'Error while authentication');
           deferred.reject(reason);
@@ -266,15 +258,15 @@
           url: BASE_URL + '/users/login',
           method: 'POST',
           data: {
-            emailId: credentials.emailId,
+            username: credentials.username,
             password: credentials.password
           }
         };
         $http(req).then(function(payload) {
-          ApplicationStorage.storeJwtToken(payload.data.data[0].token, credentials.rememberMe);
+          ApplicationStorage.storeJwtToken(payload.token, credentials.rememberMe);
           // Get the user profile and save it to local storage
           Profiles.fetchAndSaveUserProfile();
-          deferred.resolve(payload.data);
+          deferred.resolve(payload);
         }, function(reason) {
           Logger.error(reason, 'Error while authentication');
           deferred.reject(reason);
@@ -310,13 +302,13 @@
         });
       };
 
-      service.query = function(queryCriteria) {
+      service.getByOrganization = function() {
         return RequestHelper.execute({
-          url: BASE_DEV_URL + '/queryReceipts.json'
+          url: BASE_DEV_URL + '/getByOrganizationReceipts.json'
         });
       };
 
-      service.me = function(queryCriteria) {
+      service.me = function() {
         return RequestHelper.execute({
           url: BASE_DEV_URL + '/meReceipts.json'
         });
@@ -348,15 +340,15 @@
         });
       };
 
-      service.query = function(queryCriteria) {
+      service.getByOrganization = function() {
         return RequestHelper.execute({
-          url: serviceURL + '?' + ApplicationUtil.parseQueryCriteria(queryCriteria)
+          url: serviceURL
         });
       };
 
-      service.me = function(queryCriteria) {
+      service.me = function() {
         return RequestHelper.execute({
-          url: '/me' + serviceURL  + ApplicationUtil.parseQueryCriteria(queryCriteria)
+          url: '/me' + serviceURL
         });
       };
 
