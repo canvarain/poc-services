@@ -35,8 +35,24 @@
         Receipts: 'Receipts',
         Profiles: 'Profiles',
         Auth: 'Auth',
+        Registration: 'Registration',
         Organizations: 'Organizations'
-      }
+      },
+      USER_TYPES: {
+        staff: 'staff',
+        customer: 'customer',
+        both: 'both'
+      },
+      ANDROID_NOTIFICATION_EVENT_TYPES: {
+        registered: 'registered',
+        message: 'message',
+        error: 'error'
+      },
+      DEVICE_TYPES: {
+        android: 'android',
+        ios: 'ios'
+      },
+      GCM_SENDER_ID: '610089542933'
     })
     .factory('RequestHelper', ['$q', '$http', 'APP_CONSTANTS', 'ApplicationStorage', 'Logger',
       function( $q, $http, APP_CONSTANTS, ApplicationStorage, Logger){
@@ -234,7 +250,7 @@
         service.updateDevice = function(deviceId, type) {
           var profile = ApplicationStorage.getUserProfile();
           return RequestHelper.execute({
-            url: BASE_URL + 'users/' + profile.id + '/updateDevice',
+            url: BASE_URL + '/users/' + profile.id + '/updateDevice',
             method: 'POST',
             data: {
               deviceId: deviceId,
@@ -246,7 +262,7 @@
         service.removeDevice = function(deviceId) {
           var profile = ApplicationStorage.getUserProfile();
           return RequestHelper.execute({
-            url: BASE_URL + 'users/' + profile.id + '/removeDevice',
+            url: BASE_URL + '/users/' + profile.id + '/removeDevice',
             method: 'POST',
             data: {
               deviceId: deviceId
