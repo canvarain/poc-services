@@ -24,6 +24,7 @@ module.exports = function (grunt) {
         files: {
           '<%= distdir %>/services.min.js': ['services.js'],
         }
+
       }
     },
     jshint: {
@@ -31,9 +32,17 @@ module.exports = function (grunt) {
       options: {
         eqnull: true
       }
+    },
+    copy: {
+      files: {
+        cwd:  './',
+        src:  'services.js',
+        dest: '<%= distdir %>/',
+        expand: true
+      }
     }
   });
 
   grunt.registerTask('default', ['jshint']);
-  grunt.registerTask('dist', 'Perform a clean build', ['jshint', 'clean', 'uglify']);
+  grunt.registerTask('dist', 'Perform a clean build', ['jshint', 'clean', 'uglify', 'copy']);
 };
