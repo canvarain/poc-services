@@ -197,6 +197,10 @@
     }])
     .factory('Logger', ['$log', 'ENVIRONMENT', function($log, ENVIRONMENT) {
       var service = {};
+      service.info = function(data, message) {
+        message = message || 'Success ';
+        $log.info('[ENVIRONMENT ' + ENVIRONMENT + '] ' + message + ' [ ' + angular.toJson(data) + ' ]');
+      };
       service.error = function(error, message) {
         message = message || 'Error ';
         $log.error('[ENVIRONMENT ' + ENVIRONMENT + '] ' + message + ' [ ' + angular.toJson(error.data || error) + ' ]');
@@ -248,6 +252,7 @@
         };
 
         service.updateDevice = function(deviceId, type) {
+          Logger.info({}, 'Updating device info');
           var profile = ApplicationStorage.getUserProfile();
           return RequestHelper.execute({
             url: BASE_URL + '/users/' + profile.id + '/updateDevice',
@@ -260,6 +265,7 @@
         };
 
         service.removeDevice = function(deviceId) {
+          Logger.info({}, 'Removing device info');
           var profile = ApplicationStorage.getUserProfile();
           return RequestHelper.execute({
             url: BASE_URL + '/users/' + profile.id + '/removeDevice',
@@ -381,10 +387,13 @@
 
       service.create = function(entity) {
 
+        // Note : we are sending an empty header object so that a default
+        // header is not sent along with the request
         return RequestHelper.execute({
           method: 'POST',
           url: serviceURL,
-          data: entity
+          data: entity,
+          headers: {}
         });
       };
 
