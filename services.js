@@ -365,13 +365,10 @@
 
       service.create = function(entity) {
 
-        // Note : we are sending an empty header object so that a default
-        // header is not sent along with the request
         return RequestHelper.execute({
           method: 'POST',
           url: serviceURL,
-          data: entity,
-          headers: {}
+          data: entity
         });
       };
 
