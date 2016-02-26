@@ -39,9 +39,9 @@
         Organizations: 'Organizations'
       },
       USER_TYPES: {
-        staff: 'staff',
-        customer: 'customer',
-        both: 'both'
+        staff: 'BUSINESS_EMPLOYEE',
+        customer: 'INDIVIDUAL',
+        both: 'BOTH'
       },
       ANDROID_NOTIFICATION_EVENT_TYPES: {
         registered: 'registered',
@@ -49,10 +49,10 @@
         error: 'error'
       },
       DEVICE_TYPES: {
-        android: 'android',
-        ios: 'ios'
+        android: 'ANDROID',
+        ios: 'IOS'
       },
-      GCM_SENDER_ID: '610089542933'
+      GCM_SENDER_ID: '675017893424'
     })
     .factory('RequestHelper', ['$q', '$http', 'APP_CONSTANTS', 'ApplicationStorage', 'Logger',
       function( $q, $http, APP_CONSTANTS, ApplicationStorage, Logger){
@@ -315,7 +315,7 @@
           url: BASE_URL + '/users/login',
           method: 'POST',
           data: {
-            username: credentials.username,
+            email: credentials.username,
             password: credentials.password
           }
         };
